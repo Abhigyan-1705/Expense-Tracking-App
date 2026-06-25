@@ -1,11 +1,13 @@
 package com.example.abhigyan
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -17,6 +19,8 @@ enum class AuthMode {
 @Composable
 fun LoginScreen() {
     var mode by remember { mutableStateOf(AuthMode.Login) }
+    val context = LocalContext.current
+    var loading by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -56,8 +60,53 @@ fun LoginScreen() {
 
                 AuthForm(
                     mode = mode,
-                    onPrimaryClick = { },
-                    onSecondaryClick = { }
+                    loading = loading,
+                    onPrimaryClick = { email, password, confirmPassword ->
+                        if (email.isBlank()) {
+                            Toast.makeText(context, "Email cannot be empty", Toast.LENGTH_SHORT).show()
+                            return@AuthForm
+                        }
+                        if (password.length < 6) {
+                            Toast.makeText(context, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+                            return@AuthForm
+                        }
+                        if (mode == AuthMode.Signup && password != confirmPassword) {
+                            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                            return@AuthForm
+                        }
+
+                        loading = true
+                        if (mode == AuthMode.Login) {
+                            FirebaseAuthManager.login(
+                                email,
+                                password,
+                                onSuccess = {
+                                    loading = false
+                                    Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
+                                },
+                                onFailure = { error ->
+                                    loading = false
+                                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        } else {
+                            FirebaseAuthManager.signup(
+                                email,
+                                password,
+                                onSuccess = {
+                                    loading = false
+                                    Toast.makeText(context, "Account Created Successfully", Toast.LENGTH_SHORT).show()
+                                },
+                                onFailure = { error ->
+                                    loading = false
+                                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        }
+                    },
+                    onSecondaryClick = {
+                        mode = if (mode == AuthMode.Login) AuthMode.Signup else AuthMode.Login
+                    }
                 )
             }
         }
@@ -110,7 +159,8 @@ private fun AuthModeToggle(
 @Composable
 private fun AuthForm(
     mode: AuthMode,
-    onPrimaryClick: () -> Unit,
+    loading: Boolean,
+    onPrimaryClick: (String, String, String) -> Unit,
     onSecondaryClick: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
@@ -164,12 +214,19 @@ private fun AuthForm(
         }
 
         Button(
-            onClick = onPrimaryClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
+            enabled = !loading,
+            onClick = { onPrimaryClick(email, password, confirmPassword) },
+            modifier = Modifier.fillMaxWidth().height(52.dp)
         ) {
-            Text(if (mode == AuthMode.Login) "Login" else "Create Account")
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            } else {
+                Text(if (mode == AuthMode.Login) "Login" else "Create Account")
+            }
         }
 
         TextButton(
