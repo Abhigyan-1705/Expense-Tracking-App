@@ -11,13 +11,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.abhigyan.ui.theme.navigation.Screen
 
 enum class AuthMode {
     Login, Signup
 }
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController) {
     var mode by remember { mutableStateOf(AuthMode.Login) }
     val context = LocalContext.current
     var loading by remember { mutableStateOf(false) }
@@ -81,8 +83,21 @@ fun LoginScreen() {
                                 email,
                                 password,
                                 onSuccess = {
+
                                     loading = false
-                                    Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
+
+                                    Toast.makeText(
+                                        context,
+                                        "Login Successful",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+
+                                    navController.navigate(Screen.Home.route) {
+                                        popUpTo(Screen.Login.route) {
+                                            inclusive = true
+                                        }
+                                    }
+
                                 },
                                 onFailure = { error ->
                                     loading = false
@@ -94,8 +109,21 @@ fun LoginScreen() {
                                 email,
                                 password,
                                 onSuccess = {
+
                                     loading = false
-                                    Toast.makeText(context, "Account Created Successfully", Toast.LENGTH_SHORT).show()
+
+                                    Toast.makeText(
+                                        context,
+                                        "Account Created Successfully",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+
+                                    navController.navigate(Screen.Home.route) {
+                                        popUpTo(Screen.Login.route) {
+                                            inclusive = true
+                                        }
+                                    }
+
                                 },
                                 onFailure = { error ->
                                     loading = false
@@ -234,11 +262,10 @@ private fun AuthForm(
             modifier = Modifier.align(Alignment.End)
         ) {
             Text(
-                text = if (mode == AuthMode.Login) {
+                if (mode == AuthMode.Login)
                     "Don't have an account?"
-                } else {
+                else
                     "Already have an account?"
-                }
             )
         }
     }
