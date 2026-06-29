@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import com.example.abhigyan.ui.theme.RupLoTheme
-import com.example.abhigyan.ui.theme.navigation.AppNavigation
+import com.example.abhigyan.ui.navigation.AppNavigation
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
