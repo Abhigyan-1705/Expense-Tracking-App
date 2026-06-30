@@ -1,4 +1,4 @@
-markdown# RupLo 💸
+# RupLo 💸
 
 **Rup**ee **Lo**g — *Log your money.*
 
