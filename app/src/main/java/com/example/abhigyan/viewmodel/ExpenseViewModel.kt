@@ -16,7 +16,12 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
 
     init {
         val dao = (application as RupLoApp).database.expenseDao()
-        repository = ExpenseRepository(dao)
+        repository = ExpenseRepository(dao, application.applicationContext)
+
+        // Sync local data to Firestore on startup
+        viewModelScope.launch {
+            repository.syncToFirestore()
+        }
     }
 
     val allExpenses = repository.allExpenses.stateIn(
@@ -46,6 +51,12 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
     fun deleteExpense(expense: Expense) {
         viewModelScope.launch {
             repository.delete(expense)
+        }
+    }
+
+    fun syncNow() {
+        viewModelScope.launch {
+            repository.syncToFirestore()
         }
     }
 }
