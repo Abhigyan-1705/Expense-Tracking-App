@@ -32,5 +32,8 @@ fun AppNavigation() {
         composable(Screen.AddExpense.route) {
             AddExpenseScreen(navController, viewModel)
         }
+        composable(Screen.Statistics.route) {
+            StatisticsScreen(navController, viewModel)
+        }
     }
 }

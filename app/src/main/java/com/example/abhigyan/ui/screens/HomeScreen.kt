@@ -88,17 +88,28 @@ fun HomeScreen(
                 }
             }
 
-            // Logout
-            TextButton(
-                onClick = {
-                    FirebaseAuthManager.logout()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.Home.route) { inclusive = true }
-                    }
-                },
-                modifier = Modifier.align(Alignment.End)
+            // Top Row — Statistics + Logout
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Logout", color = MaterialTheme.colorScheme.error)
+                TextButton(
+                    onClick = { navController.navigate(Screen.Statistics.route) }
+                ) {
+                    Text("📊 Statistics")
+                }
+
+                TextButton(
+                    onClick = {
+                        FirebaseAuthManager.logout()
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Home.route) { inclusive = true }
+                        }
+                    }
+                ) {
+                    Text("Logout", color = MaterialTheme.colorScheme.error)
+                }
             }
 
             // Transaction List
@@ -106,7 +117,9 @@ fun HomeScreen(
 
             if (expenses.isEmpty()) {
                 Box(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -142,8 +155,11 @@ fun ExpenseItem(expense: Expense, onDelete: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(expense.title, style = MaterialTheme.typography.titleSmall)
                 Text(expense.category, style = MaterialTheme.typography.bodySmall)
-                Text(expense.date, style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    expense.date,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
             Text(
                 text = if (expense.isIncome) "+₹${expense.amount}" else "-₹${expense.amount}",
@@ -151,8 +167,11 @@ fun ExpenseItem(expense: Expense, onDelete: () -> Unit) {
                 style = MaterialTheme.typography.titleMedium
             )
             IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete",
-                    tint = MaterialTheme.colorScheme.error)
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Delete",
+                    tint = MaterialTheme.colorScheme.error
+                )
             }
         }
     }
